@@ -21,6 +21,20 @@ connection.connect(function(err) {
  
   connection.end();
 });
+function addDepartment(department){
+    connection.query(
+        "INSERT INTO departments SET ?",
+        {
+            name: department
+        
+        },
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            connection.end();
+        }
+    );
+}
 function addRole(title,salary,department){
     var dept_id;
     connection.query(`SELECT id FROM departments WHERE ?`,
