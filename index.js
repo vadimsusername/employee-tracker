@@ -21,7 +21,35 @@ connection.connect(function(err) {
  
   connection.end();
 });
-
+function addRole(title,salary,department){
+    var dept_id;
+    connection.query(`SELECT id FROM departments WHERE ?`,
+      {
+        name: department
+      },
+      function(err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        console.log(`First query, department id is : ${res[0].id}`);
+        dept_id = res[0].id;
+        console.log("Inserting a new employee...\n");
+        connection.query(
+            "INSERT INTO roles SET ?",
+            {
+                title: title,
+                salary: salary,
+                department_id: dept_id,
+            },
+            function(err, res) {
+                if (err) throw err;
+                console.log(res);
+                connection.end();
+            }
+        );
+      }
+    );
+}
 function addEmployeeHelper(first,last,role,manager){
 
     console.log("Inserting a new employee...\n");
