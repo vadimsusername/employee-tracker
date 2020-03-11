@@ -21,6 +21,36 @@ connection.connect(function(err) {
  
   connection.end();
 });
+function getEmployees(){
+    connection.query(
+        "SELECT * from employees",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            connection.end();
+        }
+    );
+}
+function getRoles(){
+    connection.query(
+        "SELECT * from roles",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            connection.end();
+        }
+    );
+}
+function getDepartments(){
+    connection.query(
+        "SELECT * from departments",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            connection.end();
+        }
+    );
+}
 function addDepartment(department){
     connection.query(
         "INSERT INTO departments SET ?",
