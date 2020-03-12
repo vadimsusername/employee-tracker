@@ -40,16 +40,25 @@ function updateRole(role,newSalary){
     }
   );
 }
+function getRole(role){
+  console.log("In getRole");
+  connection.query(
+    `SELECT roles.title,roles.salary,departments.name FROM roles JOIN departments on roles.department_id = departments.id WHERE roles.title = ?`,[role],
+    function(err, res) {
+        if (err) throw err;
+        console.log(res);
+        showMainMenu();
+    }
+  );
+}
 function getEmployee(fname,lname){
-  var name;
-  var role_id;
-  var manager_id;
+
   connection.query(
       `SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  WHERE e.first_name = "${fname}" AND e.last_name = "${lname}"`,
       function(err, res) {
           if (err) throw err;
           console.log(res);
-          connection.end();
+          showMainMenu();
       }
   );
 }
@@ -187,6 +196,58 @@ function addEmployee(fname,lname,role,manager){
     );
 
 }
+function chooseRole(){
+  connection.query(
+    "SELECT title FROM roles",
+    function(err,res) {
+      if(err) throw err;
+      console.log("in choose role");
+      console.log(res);
+      let roles = res.map(row => row.title);
+      console.log(roles);
+
+      inquirer.prompt(
+        {
+          type: "list",
+          message: "Choose a Role",
+          choices: roles,
+          name: "role"
+        }
+      ).then(answer => {
+          console.log(answer.role);
+          getRole(answer.role);
+      });
+    }
+  );
+}
+function chooseEmployee(){
+  connection.query(
+    "SELECT first_name,last_name FROM employees",
+    function(err, res) {
+      if (err) throw err;
+      console.log("in chooseEmployee");
+      console.log(res);     
+      let employees = res.map(row => `${row.first_name} ${row.last_name}`);
+     
+      console.log(employees);
+      
+      inquirer.prompt({
+        type: "list",
+        message: "Choose Employee: ",
+        choices: employees,
+        name: "employee"
+      }).then(answer =>{
+        console.log("Choose employee response");
+        console.log(answer.employee);
+        let firstname = answer.employee.split(" ")[0];
+        let lastname = answer.employee.split(" ")[1];
+        getEmployee(firstname,lastname);
+      });
+      
+   
+    }
+  );
+}
 var firstprompt = [
   {
     type: "list",
@@ -209,7 +270,12 @@ function showMainMenu(){
       case "View Departments":
         getDepartments();
         break;
-  
+      case "View an Employee":
+        chooseEmployee();
+        break;
+      case "View a Role":
+        chooseRole();
+        break;
 
     }
   });
