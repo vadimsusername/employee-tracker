@@ -17,7 +17,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
+  //console.log("connected as id " + connection.threadId + "\n");
  
   showMainMenu();
 });
@@ -34,7 +34,7 @@ function updateRoleSalary(role,newSalary){
     ],
     function(err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " role updated!\n");
+      //console.log(res.affectedRows + " role updated!\n");
       showMainMenu();
     }
   );
@@ -52,7 +52,7 @@ function updateRoleTitle(role,newTitle){
     ],
     function(err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " role updated!\n");
+      //console.log(res.affectedRows + " role updated!\n");
       // Call deleteProduct AFTER the UPDATE completes
       showMainMenu();
     }
@@ -66,7 +66,7 @@ function updateRoleDepartment(role,department){
       function(err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log(res);
+        //console.log(res);
         let newId = res[0].id;
         connection.query(
           "UPDATE roles SET ? WHERE ?",
@@ -80,7 +80,7 @@ function updateRoleDepartment(role,department){
           ],
           function(err, res) {
             if (err) throw err;
-            console.log(res.affectedRows + " role updated!\n");
+            //console.log(res.affectedRows + " role updated!\n");
             // Call deleteProduct AFTER the UPDATE completes
             showMainMenu();
           }
@@ -91,12 +91,12 @@ function updateRoleDepartment(role,department){
   
 }
 function getRole(role){
-  console.log("In getRole");
+  //console.log("In getRole");
   connection.query(
     `SELECT roles.title,roles.salary,departments.name FROM roles JOIN departments on roles.department_id = departments.id WHERE roles.title = ?`,[role],
     function(err, res) {
         if (err) throw err;
-        console.log(res);
+        //console.log(res);
         showMainMenu();
     }
   );
@@ -107,7 +107,7 @@ function getEmployee(fname,lname){
       `SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  WHERE e.first_name = "${fname}" AND e.last_name = "${lname}"`,
       function(err, res) {
           if (err) throw err;
-          console.log(res);
+          //console.log(res);
           showMainMenu();
       }
   );
@@ -117,7 +117,7 @@ function getEmployees(){
       "SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  ",
   function(err, res) {
           if (err) throw err;
-          console.log(res);
+          //console.log(res);
           //connection.end();
           showMainMenu();
       }
@@ -128,7 +128,7 @@ function getRoles(){
       "SELECT roles.title,roles.salary,departments.name  FROM roles JOIN departments on roles.department_id = departments.id",
       function(err, res) {
           if (err) throw err;
-          console.log(res);
+          //console.log(res);
           showMainMenu();
       }
   );
@@ -138,7 +138,7 @@ function getDepartments(){
         "SELECT * from departments",
         function(err, res) {
             if (err) throw err;
-            console.log(res);
+            //console.log(res);
             showMainMenu();
         }
     );
@@ -152,7 +152,7 @@ function addDepartment(department){
         },
         function(err, res) {
             if (err) throw err;
-            console.log(res);
+            //console.log(res);
             showMainMenu();
         }
     );
@@ -166,10 +166,10 @@ function addRole(title,salary,department){
     function(err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
-      console.log(res);
-      console.log(`First query, department id is : ${res[0].id}`);
+      //console.log(res);
+      //console.log(`First query, department id is : ${res[0].id}`);
       dept_id = res[0].id;
-      console.log("Inserting a new role...\n");
+      //console.log("Inserting a new role...\n");
       connection.query(
           "INSERT INTO roles SET ?",
           {
@@ -179,7 +179,7 @@ function addRole(title,salary,department){
           },
           function(err, res) {
               if (err) throw err;
-              console.log(res);
+              //console.log(res);
               showMainMenu();
           }
       );
@@ -188,7 +188,7 @@ function addRole(title,salary,department){
 }
 function addEmployeeHelper(first,last,role,manager){
 
-    console.log("Inserting a new employee...\n");
+    //console.log("Inserting a new employee...\n");
     var query = connection.query(
       "INSERT INTO employees SET ?",
       {
@@ -199,7 +199,7 @@ function addEmployeeHelper(first,last,role,manager){
       },
       function(err, res) {
         if (err) throw err;
-        console.log(res);
+        //console.log(res);
         showMainMenu();
       }
     );
@@ -220,8 +220,8 @@ function addEmployee(fname,lname,role,manager){
       function(err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log(res);
-        console.log(`First query, manager id is: ${res[0].id}`);
+        //console.log(res);
+        //console.log(`First query, manager id is: ${res[0].id}`);
         
         //return res[0].id;
         manager_id = res[0].id;
@@ -234,8 +234,8 @@ function addEmployee(fname,lname,role,manager){
             function(err, res) {
                 if (err) throw err;
                 // Log all results of the SELECT statement
-                console.log(res[0].id);
-                console.log(`Second query, manager id is: ${manager_id} role id is : ${res[0].id}`);            
+                //console.log(res[0].id);
+                //console.log(`Second query, manager id is: ${manager_id} role id is : ${res[0].id}`);            
                 role_id = res[0].id;
                 addEmployeeHelper(fname,lname,role_id,manager_id);
                 //connection.end();
@@ -251,19 +251,19 @@ function addEmployeePrompt(){
     "SELECT first_name,last_name FROM employees",
     function(err, res) {
       if (err) throw err;
-      console.log("in add employee");
-      console.log(res);     
+      //console.log("in add employee");
+      //console.log(res);     
       let employees = res.map(row => `${row.first_name} ${row.last_name}`);
-      console.log(employees);
+      //console.log(employees);
       connection.query(
         `SELECT title FROM roles`,
         function(err, res) {
           if (err) throw err;
-          console.log("in add employee, get roles");
-          console.log(employees);
-          console.log(res);
+          //console.log("in add employee, get roles");
+          //console.log(employees);
+          //console.log(res);
           let roles = res.map(row => row.title);
-          console.log(roles);
+          //console.log(roles);
           inquirer.prompt([
             {
               type: "input",
@@ -288,7 +288,7 @@ function addEmployeePrompt(){
               name: "manager"
             }
           ]).then(answers =>{
-             console.log(answers);
+             //console.log(answers);
              addEmployee(answers.firstname,answers.lastname,answers.role,answers.manager);
           });
         }
@@ -310,10 +310,10 @@ function updateRolePrompt(){
     "SELECT title FROM roles",
     function(err,res) {
       if(err) throw err;
-      console.log("in choose role");
-      console.log(res);
+      //console.log("in choose role");
+      //console.log(res);
       let roles = res.map(row => row.title);
-      console.log(roles);
+      //console.log(roles);
 
       inquirer.prompt(
         {
@@ -324,7 +324,7 @@ function updateRolePrompt(){
         },
 
       ).then(answer => {
-          console.log(answer.role);
+          //console.log(answer.role);
           let updateRole = answer.role;
           inquirer.prompt({
             type:"list",
@@ -352,7 +352,7 @@ function updateRolePrompt(){
                     "SELECT * from departments",
                     function(err, res) {
                         if (err) throw err;
-                        console.log(res);
+                        //console.log(res);
                         let departments = res.map(row => row.name);
                         inquirer.prompt({
                           type:"list",
@@ -378,11 +378,11 @@ function addRolePrompt(){
       function(err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
-        console.log("in add role prompt, get departments")
-        console.log(res);
+        //console.log("in add role prompt, get departments")
+        //console.log(res);
         let departments = res.map(row => row.name);
        
-        console.log(departments);
+        //console.log(departments);
         
         inquirer.prompt([{
             type: "input",
@@ -401,7 +401,7 @@ function addRolePrompt(){
             name: "department"
           }
         ]).then(answers => {
-            console.log(answers);
+            //console.log(answers);
             addRole(answers.title,answers.salary,answers.department);
         });
       }
@@ -413,10 +413,10 @@ function chooseRole(){
     "SELECT title FROM roles",
     function(err,res) {
       if(err) throw err;
-      console.log("in choose role");
-      console.log(res);
+      //console.log("in choose role");
+      //console.log(res);
       let roles = res.map(row => row.title);
-      console.log(roles);
+      //console.log(roles);
 
       inquirer.prompt(
         {
@@ -426,7 +426,7 @@ function chooseRole(){
           name: "role"
         }
       ).then(answer => {
-          console.log(answer.role);
+          //console.log(answer.role);
           getRole(answer.role);
       });
     }
@@ -437,11 +437,11 @@ function chooseEmployee(){
     "SELECT first_name,last_name FROM employees",
     function(err, res) {
       if (err) throw err;
-      console.log("in chooseEmployee");
-      console.log(res);     
+      //console.log("in chooseEmployee");
+      //console.log(res);     
       let employees = res.map(row => `${row.first_name} ${row.last_name}`);
      
-      console.log(employees);
+      //console.log(employees);
       
       inquirer.prompt({
         type: "list",
@@ -449,8 +449,8 @@ function chooseEmployee(){
         choices: employees,
         name: "employee"
       }).then(answer =>{
-        console.log("Choose employee response");
-        console.log(answer.employee);
+        //console.log("Choose employee response");
+        //console.log(answer.employee);
         let firstname = answer.employee.split(" ")[0];
         let lastname = answer.employee.split(" ")[1];
         getEmployee(firstname,lastname);
