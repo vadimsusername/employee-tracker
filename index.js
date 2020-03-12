@@ -117,7 +117,8 @@ function getEmployees(){
       "SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  ",
   function(err, res) {
           if (err) throw err;
-          console.log(res);
+          //console.log(res);
+          console.table(res);
           //connection.end();
           showMainMenu();
       }
@@ -128,7 +129,8 @@ function getRoles(){
       "SELECT roles.title,roles.salary,departments.name  FROM roles JOIN departments on roles.department_id = departments.id",
       function(err, res) {
           if (err) throw err;
-          console.log(res);
+          //console.log(res);
+          console.table(res);
           showMainMenu();
       }
   );
@@ -138,7 +140,8 @@ function getDepartments(){
         "SELECT * from departments",
         function(err, res) {
             if (err) throw err;
-            console.log(res);
+            //console.log(res);
+            console.table(res);
             showMainMenu();
         }
     );
