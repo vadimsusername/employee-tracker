@@ -21,7 +21,7 @@ connection.connect(function(err) {
  
   connection.end();
 });
-function updateRole(role,newSalary){
+function updateRoleSalary(role,newSalary){
   connection.query(
     "UPDATE roles SET ? WHERE ?",
     [
@@ -34,11 +34,61 @@ function updateRole(role,newSalary){
     ],
     function(err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " products updated!\n");
-      // Call deleteProduct AFTER the UPDATE completes
-      connection.end();
+      console.log(res.affectedRows + " role updated!\n");
+      showMainMenu();
     }
   );
+}
+function updateRoleTitle(role,newTitle){
+  connection.query(
+    "UPDATE roles SET ? WHERE ?",
+    [
+      {
+        title: newTitle
+      },
+      {
+        title: role
+      }
+    ],
+    function(err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " role updated!\n");
+      // Call deleteProduct AFTER the UPDATE completes
+      showMainMenu();
+    }
+  );
+}
+function updateRoleDepartment(role,department){
+  connection.query(`SELECT id FROM departments WHERE ?`,
+      {
+        name: department
+      },
+      function(err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        let newId = res[0].id;
+        connection.query(
+          "UPDATE roles SET ? WHERE ?",
+          [
+            {
+              department_id: newId
+            },
+            {
+              title: role
+            }
+          ],
+          function(err, res) {
+            if (err) throw err;
+            console.log(res.affectedRows + " role updated!\n");
+            // Call deleteProduct AFTER the UPDATE completes
+            showMainMenu();
+          }
+        );
+     
+      }
+    );
+  
 }
 function getRole(role){
   console.log("In getRole");
@@ -254,6 +304,74 @@ function addDepartmentPrompt(){
     name: "department"
   }).then(answer => addDepartment(answer.department));
 }
+function updateRolePrompt(){
+  
+  connection.query(
+    "SELECT title FROM roles",
+    function(err,res) {
+      if(err) throw err;
+      console.log("in choose role");
+      console.log(res);
+      let roles = res.map(row => row.title);
+      console.log(roles);
+
+      inquirer.prompt(
+        {
+          type: "list",
+          message: "Choose a Role to Update:",
+          choices: roles,
+          name: "role"
+        },
+
+      ).then(answer => {
+          console.log(answer.role);
+          let updateRole = answer.role;
+          inquirer.prompt({
+            type:"list",
+            message: "What would you like to change?",
+            choices:["Change Title","Change Salary","Change Department"],
+            name: "choice"
+          }).then(answer => {
+              switch (answer.choice){
+                case "Change Title":
+                  inquirer.prompt({
+                    type: "input",
+                    message: "Enter New Title",
+                    name: "title"
+                  }).then(answer => updateRoleTitle(updateRole,answer.title));
+                  break;
+                case "Change Salary":
+                  inquirer.prompt({
+                    type: "input",
+                    message: "Enter New Salary",
+                    name: "salary"
+                  }).then(answer => updateRoleSalary(updateRole,answer.salary));
+                  break;
+                case "Change Department":
+                  connection.query(
+                    "SELECT * from departments",
+                    function(err, res) {
+                        if (err) throw err;
+                        console.log(res);
+                        let departments = res.map(row => row.name);
+                        inquirer.prompt({
+                          type:"list",
+                          message:"Choose new Department:",
+                          choices: departments,
+                          name:"department"
+                        }).then(answer => {
+                          updateRoleDepartment(updateRole,answer.department);
+                        });
+                        
+                    }
+                  );
+
+              }
+          });
+      });
+    }
+  );
+}
 function addRolePrompt(){
   connection.query(
       `SELECT name FROM departments`,   
@@ -378,6 +496,9 @@ function showMainMenu(){
       case "Add a Department":
         addDepartmentPrompt();
         break;
+      case "Update a Role":
+        updateRolePrompt();
+        break;  
     }
   });
 }
