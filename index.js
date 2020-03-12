@@ -247,6 +247,13 @@ function addEmployeePrompt(){
     }
   );
 }
+function addDepartmentPrompt(){
+  inquirer.prompt({
+    type:"input",
+    message:"Enter the Name of the New Department",
+    name: "department"
+  }).then(answer => addDepartment(answer.department));
+}
 function addRolePrompt(){
   connection.query(
       `SELECT name FROM departments`,   
@@ -368,6 +375,9 @@ function showMainMenu(){
         break;
       case "Add a Role":
         addRolePrompt();
+      case "Add a Department":
+        addDepartmentPrompt();
+        break;
     }
   });
 }
