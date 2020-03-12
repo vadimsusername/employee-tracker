@@ -79,7 +79,7 @@ function getRoles(){
       function(err, res) {
           if (err) throw err;
           console.log(res);
-          connection.end();
+          showMainMenu();
       }
   );
 }
@@ -89,7 +89,7 @@ function getDepartments(){
         function(err, res) {
             if (err) throw err;
             console.log(res);
-            connection.end();
+            showMainMenu();
         }
     );
 }
@@ -103,7 +103,7 @@ function addDepartment(department){
         function(err, res) {
             if (err) throw err;
             console.log(res);
-            connection.end();
+            showMainMenu();
         }
     );
 }
@@ -130,7 +130,7 @@ function addRole(title,salary,department){
             function(err, res) {
                 if (err) throw err;
                 console.log(res);
-                connection.end();
+                showMainMenu();
             }
         );
       }
@@ -150,7 +150,7 @@ function addEmployeeHelper(first,last,role,manager){
       function(err, res) {
         if (err) throw err;
         console.log(res);
-        connection.end();
+        showMainMenu();
       }
     );
 }
@@ -247,6 +247,42 @@ function addEmployeePrompt(){
     }
   );
 }
+function addRolePrompt(){
+  connection.query(
+      `SELECT name FROM departments`,   
+      function(err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log("in add role prompt, get departments")
+        console.log(res);
+        let departments = res.map(row => row.name);
+       
+        console.log(departments);
+        
+        inquirer.prompt([{
+            type: "input",
+            message: "Enter the Title of the New Role:",
+            name: "title"
+          },
+          {
+            type: "input",
+            message: "Enter the Salary:",
+            name: "salary"
+          },
+          {
+            type: "list",
+            message: "Choose a Department",
+            choices: departments,
+            name: "department"
+          }
+        ]).then(answers => {
+            console.log(answers);
+            addRole(answers.title,answers.salary,answers.department);
+        });
+      }
+    );    
+
+}
 function chooseRole(){
   connection.query(
     "SELECT title FROM roles",
@@ -330,7 +366,8 @@ function showMainMenu(){
       case "Add an Employee":
         addEmployeePrompt();
         break;
-
+      case "Add a Role":
+        addRolePrompt();
     }
   });
 }
