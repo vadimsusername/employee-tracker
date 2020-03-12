@@ -187,7 +187,33 @@ function addEmployee(fname,lname,role,manager){
     );
 
 }
+var firstprompt = [
+  {
+    type: "list",
+    message: "Choose an option: ",
+    choices: ["View Employees","View Roles","View Departments","View an Employee","View a Role","Add an Employee","Add a Role","Add a Department","Update a Role"],
+    name: "mainmenu"
+  }
+];
 
+function showMainMenu(){
+  inquirer.prompt(firstprompt).then(answers => {
+    var choice = answers.mainmenu;
+    switch(choice){
+      case "View Employees":
+        getEmployees();
+        break;
+      case "View Roles":
+        getRoles();
+        break;
+      case "View Departments":
+        getDepartments();
+        break;
+  
+
+    }
+  });
+}
 
 
 
