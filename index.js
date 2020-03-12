@@ -21,7 +21,38 @@ connection.connect(function(err) {
  
   connection.end();
 });
-
+function updateRole(role,newSalary){
+  connection.query(
+    "UPDATE roles SET ? WHERE ?",
+    [
+      {
+        salary: newSalary
+      },
+      {
+        title: role
+      }
+    ],
+    function(err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " products updated!\n");
+      // Call deleteProduct AFTER the UPDATE completes
+      connection.end();
+    }
+  );
+}
+function getEmployee(fname,lname){
+  var name;
+  var role_id;
+  var manager_id;
+  connection.query(
+      `SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  WHERE e.first_name = "${fname}" AND e.last_name = "${lname}"`,
+      function(err, res) {
+          if (err) throw err;
+          console.log(res);
+          connection.end();
+      }
+  );
+}
 function getEmployees(){
   connection.query(
       "SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  ",
