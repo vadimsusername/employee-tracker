@@ -93,10 +93,10 @@ function updateRoleDepartment(role,department){
 function getRole(role){
   //console.log("In getRole");
   connection.query(
-    `SELECT roles.title,roles.salary,departments.name FROM roles JOIN departments on roles.department_id = departments.id WHERE roles.title = ?`,[role],
+    `SELECT roles.title AS Title,roles.salary AS Salary,departments.name AS Department FROM roles JOIN departments on roles.department_id = departments.id WHERE roles.title = ?`,[role],
     function(err, res) {
         if (err) throw err;
-        //console.log(res);
+        console.table(res);
         showMainMenu();
     }
   );
@@ -104,26 +104,35 @@ function getRole(role){
 function getEmployee(fname,lname){
 
   connection.query(
-      `SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  WHERE e.first_name = "${fname}" AND e.last_name = "${lname}"`,
+      `SELECT e.first_name AS First_Name,e.last_name AS Last_Name,roles.title AS Title,roles.salary AS Salary,d.name AS Department,m.first_name AS Manager_First_Name,m.last_name AS Manager_Last_Name FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  WHERE e.first_name = "${fname}" AND e.last_name = "${lname}"`,
       function(err, res) {
           if (err) throw err;
-          console.log(res);
+          var display = res.map(row => {
+            if(row.Manager_First_Name === null){
+              row.Manager_First_Name = "--";
+            }
+            if(row.Manager_Last_Name === null){
+              row.Manager_Last_Name = "--"
+            }
+            return row;
+          })
+          console.table(res);
           showMainMenu();
       }
   );
 }
 function getEmployees(){
   connection.query(
-      "SELECT e.first_name AS First,e.last_name AS Last,roles.title,roles.salary,d.name,m.first_name AS ManagerFirst,m.last_name AS Managerlast FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  ",
+      "SELECT e.first_name AS First_Name,e.last_name AS Last_Name,roles.title AS Title,roles.salary AS Salary,d.name AS Department,m.first_name AS Manager_First_Name,m.last_name AS Manager_Last_Name FROM employees AS e LEFT JOIN employees AS m ON e.manager_id = m.id INNER JOIN roles ON e.role_id = roles.id INNER JOIN departments AS d ON roles.department_id = d.id  ",
   function(err, res) {
           if (err) throw err;
           //console.log(res);
           var display = res.map(row => {
-            if(row.ManagerFirst === null){
-              row.ManagerFirst = "--";
+            if(row.Manager_First_Name === null){
+              row.Manager_First_Name = "--";
             }
-            if(row.Managerlast === null){
-              row.Managerlast = "--"
+            if(row.Manager_Last_Name === null){
+              row.Manager_Last_Name = "--"
             }
             return row;
           })
@@ -135,7 +144,7 @@ function getEmployees(){
 }
 function getRoles(){
   connection.query(
-      "SELECT roles.title,roles.salary,departments.name  FROM roles JOIN departments on roles.department_id = departments.id",
+      "SELECT roles.title AS Title,roles.salary AS Salary,departments.name AS Department FROM roles JOIN departments on roles.department_id = departments.id",
       function(err, res) {
           if (err) throw err;
           //console.log(res);
@@ -146,7 +155,7 @@ function getRoles(){
 }
 function getDepartments(){
     connection.query(
-        "SELECT * from departments",
+        "SELECT name AS Department from departments",
         function(err, res) {
             if (err) throw err;
             //console.log(res);
@@ -218,44 +227,68 @@ function addEmployeeHelper(first,last,role,manager){
 }
 
 function addEmployee(fname,lname,role,manager){
-    var manager_fname = manager.split(" ")[0];
-    var manager_lname = manager.split(" ")[1];
-    var manager_id;
-    var role_id;
-    connection.query(`SELECT id FROM employees WHERE ? AND ?`,
-      [{
-        first_name: manager_fname
-      },
-      {
-        last_name: manager_lname
-      }],
-      function(err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        //console.log(res);
-        //console.log(`First query, manager id is: ${res[0].id}`);
-        
-        //return res[0].id;
-        manager_id = res[0].id;
-       
-        //return res[0].id;
-        connection.query(`SELECT id FROM roles WHERE ?`,
-            {
-                title: role
-            },
-            function(err, res) {
-                if (err) throw err;
-                // Log all results of the SELECT statement
-                //console.log(res[0].id);
-                //console.log(`Second query, manager id is: ${manager_id} role id is : ${res[0].id}`);            
-                role_id = res[0].id;
-                addEmployeeHelper(fname,lname,role_id,manager_id);
-                //connection.end();
-            }
-        );
     
-      }
-    );
+    var role_id;
+    if(manager !== "None"){
+      var manager_fname = manager.split(" ")[0];
+      var manager_lname = manager.split(" ")[1];
+    
+      var manager_id;
+      
+      connection.query(`SELECT id FROM roles WHERE ?`,
+          {
+              title: role
+          },
+        function(err, res) {
+          if (err) throw err;
+          // Log all results of the SELECT statement
+          //console.log(res);
+          //console.log(`First query, manager id is: ${res[0].id}`);
+          
+          //return res[0].id;
+          role_id = res[0].id;
+        
+          //return res[0].id;
+          connection.query(`SELECT id FROM employees WHERE ? AND ?`,
+              [{
+                first_name: manager_fname
+              },
+              {
+                last_name: manager_lname
+              }],
+          
+              function(err, res) {
+                  if (err) throw err;
+                  // Log all results of the SELECT statement
+                  //console.log(res[0].id);
+                  //console.log(`Second query, manager id is: ${manager_id} role id is : ${res[0].id}`);            
+                  manager_id = res[0].id;
+                  addEmployeeHelper(fname,lname,role_id,manager_id);
+                  //connection.end();
+              }
+          );
+      
+        }
+      );
+    }else{
+      connection.query(`SELECT id FROM roles WHERE ?`,
+          {
+              title: role
+          },
+        function(err, res) {
+          if (err) throw err;
+          // Log all results of the SELECT statement
+          //console.log(res);
+          //console.log(`First query, manager id is: ${res[0].id}`);
+          
+          //return res[0].id;
+          role_id = res[0].id;
+        
+          addEmployeeHelper(fname,lname,role_id);
+    
+        }
+      );
+    }
 
 }
 function addEmployeePrompt(){
@@ -266,6 +299,7 @@ function addEmployeePrompt(){
       //console.log("in add employee");
       //console.log(res);     
       let employees = res.map(row => `${row.first_name} ${row.last_name}`);
+      employees.push("None");
       //console.log(employees);
       connection.query(
         `SELECT title FROM roles`,
