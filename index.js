@@ -158,33 +158,33 @@ function addDepartment(department){
     );
 }
 function addRole(title,salary,department){
-    var dept_id;
-    connection.query(`SELECT id FROM departments WHERE ?`,
-      {
-        name: department
-      },
-      function(err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log(res);
-        console.log(`First query, department id is : ${res[0].id}`);
-        dept_id = res[0].id;
-        console.log("Inserting a new employee...\n");
-        connection.query(
-            "INSERT INTO roles SET ?",
-            {
-                title: title,
-                salary: salary,
-                department_id: dept_id,
-            },
-            function(err, res) {
-                if (err) throw err;
-                console.log(res);
-                showMainMenu();
-            }
-        );
-      }
-    );
+  var dept_id;
+  connection.query(`SELECT id FROM departments WHERE ?`,
+    {
+      name: department
+    },
+    function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.log(res);
+      console.log(`First query, department id is : ${res[0].id}`);
+      dept_id = res[0].id;
+      console.log("Inserting a new role...\n");
+      connection.query(
+          "INSERT INTO roles SET ?",
+          {
+              title: title,
+              salary: salary,
+              department_id: dept_id,
+          },
+          function(err, res) {
+              if (err) throw err;
+              console.log(res);
+              showMainMenu();
+          }
+      );
+    }
+  );
 }
 function addEmployeeHelper(first,last,role,manager){
 
@@ -493,6 +493,7 @@ function showMainMenu(){
         break;
       case "Add a Role":
         addRolePrompt();
+        break;
       case "Add a Department":
         addDepartmentPrompt();
         break;
