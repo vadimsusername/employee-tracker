@@ -118,7 +118,16 @@ function getEmployees(){
   function(err, res) {
           if (err) throw err;
           //console.log(res);
-          console.table(res);
+          var display = res.map(row => {
+            if(row.ManagerFirst === null){
+              row.ManagerFirst = "--";
+            }
+            if(row.Managerlast === null){
+              row.Managerlast = "--"
+            }
+            return row;
+          })
+          console.table(display);
           //connection.end();
           showMainMenu();
       }
