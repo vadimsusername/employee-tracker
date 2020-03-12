@@ -19,7 +19,7 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
  
-  connection.end();
+  showMainMenu();
 });
 function updateRoleSalary(role,newSalary){
   connection.query(
