@@ -196,6 +196,57 @@ function addEmployee(fname,lname,role,manager){
     );
 
 }
+function addEmployeePrompt(){
+  connection.query(
+    "SELECT first_name,last_name FROM employees",
+    function(err, res) {
+      if (err) throw err;
+      console.log("in add employee");
+      console.log(res);     
+      let employees = res.map(row => `${row.first_name} ${row.last_name}`);
+      console.log(employees);
+      connection.query(
+        `SELECT title FROM roles`,
+        function(err, res) {
+          if (err) throw err;
+          console.log("in add employee, get roles");
+          console.log(employees);
+          console.log(res);
+          let roles = res.map(row => row.title);
+          console.log(roles);
+          inquirer.prompt([
+            {
+              type: "input",
+              message: "Enter First Name",
+              name: "firstname"
+            },
+            {
+              type: "input",
+              message: "Enter Last Name",
+              name: "lastname"
+            },
+            {
+              type: "list",
+              message: "Choose Role",
+              choices: roles,
+              name: "role"
+            },
+            {
+              type: "list",
+              message: "Choose Manager",
+              choices: employees,
+              name: "manager"
+            }
+          ]).then(answers =>{
+             console.log(answers);
+             addEmployee(answers.firstname,answers.lastname,answers.role,answers.manager);
+          });
+        }
+      );
+    
+    }
+  );
+}
 function chooseRole(){
   connection.query(
     "SELECT title FROM roles",
@@ -275,6 +326,9 @@ function showMainMenu(){
         break;
       case "View a Role":
         chooseRole();
+        break;
+      case "Add an Employee":
+        addEmployeePrompt();
         break;
 
     }
